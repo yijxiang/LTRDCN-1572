@@ -1,0 +1,26 @@
+---
+
+  nxos_provider:
+    username: "{{ user }}"
+    password: "{{ pwd }}"
+    transport: nxapi
+    timeout: 30
+    host: "{{ inventory_hostname }}"
+
+  asn: 65000
+
+  bgp_neighbors:
+  - { remote_as: 65000, neighbor: 192.168.0.6, update_source: Loopback0 }
+  - { remote_as: 65000, neighbor: 192.168.0.7, update_source: Loopback0 }
+  rp_address: 192.168.0.100
+  L3_interfaces:
+  - { interface: Ethernet1/1 }
+  - { interface: Ethernet1/2 }
+  - { interface: loopback0 }
+  - { interface: loopback1 }
+  L2VNI:
+  - { vlan_id: 140, vni: 50140, ip_add: 172.21.140.1, mask: 24, vlan_name: L2-VNI-140-Tenant1, mcast: 239.0.0.140 }
+  - { vlan_id: 141, vni: 50141, ip_add: 172.21.141.1, mask: 24, vlan_name: L2-VNI-141-Tenant1, mcast: 239.0.0.141 }
+  L3VNI:
+  - { vlan_id: 999, vlan_name: L3-VNI-999-Tenant1, vni: 50999 }
+

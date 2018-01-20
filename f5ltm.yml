@@ -1,0 +1,107 @@
+---
+- name: Configurating BIG-IP
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+  - name: Configure server facing port to L2
+    nxos_interface:
+      interface: eth1/4
+      mode: layer2
+      username: "{{ user }}"
+      password: "{{ pwd }}"
+      transport: nxapi
+      host: "198.18.4.104"
+  - name: Configure VLAN for F5 port
+    nxos_switchport:
+      interface: eth1/4
+      mode: access
+      access_vlan: 140
+      username: "{{ user }}"
+      password: "{{ pwd }}"
+      transport: nxapi
+      host: "198.18.4.104"      
+  - name: Configure VLANs on the BIG-IP
+    bigip_vlan:
+     server: "198.18.4.10"
+     user: "admin"
+     password: "admin"
+     validate_certs: False
+     name: "External"
+     tag: "140"
+     untagged_interface: "1.1"
+     validate_certs: "no"
+    delegate_to: localhost
+  - name: Configure SELF-IPs on the BIG-IP
+    bigip_selfip:
+     server: "198.18.4.10"
+     user: "admin"
+     password: "admin"
+     validate_certs: False
+     name: "172.21.140.50"
+     address: "172.21.140.50"
+     netmask: "255.255.255.0"
+     vlan: "External"
+     allow_service: "default"
+     validate_certs: "no"
+    delegate_to: localhost
+  - name: Create nodes
+    bigip_node:
+      server: "198.18.4.10"
+      user: "admin"
+      password: "admin"
+      host: "{{item}}"
+      name: "{{item}}"
+      validate_certs: "no"
+    with_items:
+      - 172.21.140.10
+      - 172.21.140.11
+      - 172.21.141.10
+      - 172.21.141.11
+    delegate_to: localhost
+
+  - name: Create pool
+    bigip_pool:
+      server: "198.18.4.10"
+      user: "admin"
+      password: "admin"
+      name: "web-pool"
+      lb_method: "round-robin"
+      monitors: "/Common/http"
+      monitor_type: "and_list"
+      quorum: 1
+      validate_certs: "no"
+    delegate_to: localhost
+
+  - name: Add Pool members
+    bigip_pool_member:
+      server: "198.18.4.10"
+      user: "admin"
+      password: "admin"
+      name: "{{item}}"
+      host: "{{item}}"
+      port: "80"
+      pool: "web-pool"
+      validate_certs: "no"
+    with_items:
+      - 172.21.140.10
+      - 172.21.140.11
+      - 172.21.141.10
+      - 172.21.141.11
+    delegate_to: localhost
+
+  - name: Add Virtual Server
+    bigip_virtual_server:
+      server: "198.18.4.10"
+      user: "admin"
+      password: "admin"
+      name: "http-virtualserver"
+      destination: "172.21.140.100"
+      port: "80"
+      enabled_vlans: "ALL"
+      all_profiles:
+      - http
+      pool: "web-pool"
+      snat: "Automap"
+      validate_certs: "no"
+    delegate_to: localhost

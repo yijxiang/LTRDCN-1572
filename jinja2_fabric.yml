@@ -1,0 +1,12 @@
+---
+
+- hosts: jinja2_spine
+  connection: local
+  roles:
+    - jinja2_spine
+
+- hosts: jinja2_leaf
+  connection: local
+  roles:
+    - jinja2_leaf
+

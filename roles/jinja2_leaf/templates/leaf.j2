@@ -1,0 +1,89 @@
+feature bgp
+feature nv overlay
+feature vn-segment-vlan-based
+nv overlay evpn
+feature pim
+!
+ip pim rp-address {{rp_address}}
+spanning-tree vlan 1,140,141,999 priority 4096
+{% for L2VNI in L2VNI %}
+vlan {{L2VNI['vlan_id']}}
+name {{L2VNI['vlan_name']}}
+vn-segment {{L2VNI['vni']}}
+!
+{% endfor %}
+
+{% for L3VNI in L3VNI %}
+vlan {{L3VNI['vlan_id']}}
+vn-segment {{L3VNI['vni']}}
+vrf context Tenant-1
+vni {{L3VNI['vni']}}
+ rd auto
+ address-family ipv4 unicast
+route-target both auto
+route-target both auto evpn
+!
+{% endfor %}
+
+fabric forwarding anycast-gateway-mac 0000.2222.3333
+!
+#for loop to configure SVI
+{% for L2VNI in L2VNI %}
+interface Vlan{{L2VNI['vlan_id']}}
+  no shutdown
+  vrf member Tenant-1
+  no ip redirects
+  ip address {{L2VNI['ip_add']}}/{{L2VNI['mask']}}
+  fabric forwarding mode anycast-gateway
+  !
+{% endfor %}
+{% for L3VNI in L3VNI %}
+interface vlan{{L3VNI['vlan_id']}}
+ no shutdown
+ vrf member Tenant-1
+ ip forward
+ !
+{% endfor %}
+#for loop to enable PIM on L3 interface
+{% for interface in L3_interfaces %}
+interface {{interface['interface']}}
+ip pim sparse-mode
+!
+{% endfor %}
+
+interface nve1
+no shutdown
+source-interface loopback1
+host-reachability protocol bgp
+{% for L2VNI in L2VNI %}
+member vni {{L2VNI['vni']}}
+mcast-group {{L2VNI['mcast']}}
+{% endfor %}
+{% for L3VNI in L3VNI %}
+member vni {{L3VNI['vni']}} associate-vrf
+!
+{% endfor %}
+
+router bgp {{ asn }}
+router-id {{ router_id }}
+address-family ipv4 unicast
+address-family l2vpn evpn
+retain route-target all
+#for loop to configure bgp neighbor with spine
+{% for neighbor in bgp_neighbors %}
+neighbor {{neighbor['neighbor']}}
+remote-as {{neighbor['remote_as']}}
+update-source {{neighbor['update_source']}}
+address-family ipv4 unicast
+send-community both
+address-family l2vpn evpn
+send-community both
+!
+{% endfor %}
+evpn
+{% for L2VNI in L2VNI %}
+  vni {{L2VNI['vni']}} l2
+    rd auto
+    route-target import auto
+    route-target export auto
+{% endfor %}

@@ -1,0 +1,39 @@
+---
+  - hosts: leaf:jinja2_leaf
+    vars:
+      nxos_provider:
+        username: "{{ user }}"
+        password: "{{ pwd }}"
+        transport: nxapi
+        host: "{{ inventory_hostname }}"
+
+    tasks:
+      - name: provision VLAN
+        nxos_config:
+          lines: "vlan {{item}}"
+          provider: "{{nxos_provider}}"
+        with_items:
+          -  140
+          -  141
+        tags: add vlans
+      - name: configure server facing port to L2
+        nxos_interface:
+          interface: eth1/3
+          mode: layer2
+          provider: "{{nxos_provider}}"
+      - name: configure VLAN for server port
+        when: ("101" in inventory_hostname) or ("103" in inventory_hostname)
+        nxos_switchport:
+          interface: eth1/3
+          mode: access
+          access_vlan: 140
+          provider: "{{nxos_provider}}"
+        tags: even leaf
+      - name: configure VLAN for server port
+        when: ("102" in inventory_hostname) or ("104" in inventory_hostname)
+        nxos_switchport:
+          interface: eth1/3
+          mode: access
+          access_vlan: 141
+          provider: "{{nxos_provider}}"
+        tags: odd leaf

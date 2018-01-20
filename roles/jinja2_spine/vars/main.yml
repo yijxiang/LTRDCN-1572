@@ -1,0 +1,30 @@
+---
+# vars file for jinja2_spine
+  nxos_provider:
+    username: "{{ user }}"
+    password: "{{ pwd }}"
+    timeout: 100
+    host: "{{ inventory_hostname }}"
+  asn: 65000
+  bgp_neighbors:
+  -  remote_as: 65000
+     neighbor: 192.168.0.8
+     update_source: Loopback0
+  -  remote_as: 65000
+     neighbor: 192.168.0.9
+     update_source: Loopback0
+  -  remote_as: 65000
+     neighbor: 192.168.0.10
+     update_source: Loopback0
+  -  remote_as: 65000
+     neighbor: 192.168.0.11
+     update_source: Loopback0
+  L3_interfaces:
+  -  interface: Ethernet 1/1
+  -  interface: Ethernet 1/2
+  -  interface: Ethernet 1/3
+  -  interface: Ethernet 1/4
+  -  interface: loopback 0
+  -  interface: loopback 1
+  s1_loopback: 192.168.0.6
+  s2_loopback: 192.168.0.7

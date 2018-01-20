@@ -1,0 +1,14 @@
+---
+   - hosts: spine,leaf,jinja2_leaf,jinja2_spine
+     connection: local
+     vars:
+       ios_provider:
+          username: "{{ user }}"
+          password: "{{ pwd }}"
+          host: "{{ inventory_hostname }}"
+     tasks:
+      - name: save running
+        ios_config:
+          provider: "{{ ios_provider }}"
+          backup: yes
+          timeout: 20

@@ -1,0 +1,5 @@
+---
+- hosts: leaf,jinja2_leaf
+  connection: local
+  roles:
+    - vni_provision
