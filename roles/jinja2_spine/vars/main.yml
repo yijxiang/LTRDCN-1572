@@ -11,9 +11,6 @@
      neighbor: 192.168.0.8
      update_source: Loopback0
   -  remote_as: 65000
-     neighbor: 192.168.0.9
-     update_source: Loopback0
-  -  remote_as: 65000
      neighbor: 192.168.0.10
      update_source: Loopback0
   -  remote_as: 65000
