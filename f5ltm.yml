@@ -20,7 +20,7 @@
       username: "{{ user }}"
       password: "{{ pwd }}"
       transport: nxapi
-      host: "198.18.4.104"      
+      host: "198.18.4.104"
   - name: Configure VLANs on the BIG-IP
     bigip_vlan:
      server: "198.18.4.10"
@@ -45,6 +45,17 @@
      allow_service: "default"
      validate_certs: "no"
     delegate_to: localhost
+#  - name: Create static route
+#    bigip_static_route:
+#     server: "198.18.4.10"
+#     user: "admin"
+#     password: "admin"
+#     validate_certs: False
+#     destination: 0.0.0.0
+#     netmask: 0.0.0.0
+#     gateway_address: 172.21.140.1
+#     name: "defult"
+#    delegate_to: localhost
   - name: Create nodes
     bigip_node:
       server: "198.18.4.10"

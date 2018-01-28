@@ -1,0 +1,19 @@
+---
+   - hosts: jinja2_leaf,leaf,jinja2_spine,spine
+     connection: local
+     gather_facts: flase
+     vars:
+       ios_provider:
+          username: "{{ user }}"
+          password: "{{ pwd }}"
+          timeout: 30
+          host: "{{ inventory_hostname }}"
+       filename: "{{ lookup('pipe', 'ls backup/{{ inventory_hostname}}_config.*')}}"
+     tasks:
+       - name: configure compliance
+         register: diff_config
+#         when: (inventory_hostname in groups['leaf']) or (inventory_hostname in groups['jinja2_leaf'])
+         nxos_config:
+           provider: "{{ ios_provider }}"
+           diff_against: intended
+           intended_config: "{{ lookup('file', '{{filename}}') }}"

@@ -1,9 +1,9 @@
+#define global variables, groups and host variables
 [all:vars]
 ansible_connection = local
 user=admin
 pwd=C1sco12345
 gather_fact=no
-
 [jinja2_spine]
 198.18.4.202 router_id=192.168.0.7 loopback1=192.168.0.100
 [jinja2_leaf]
@@ -11,11 +11,11 @@ gather_fact=no
 [spine]
 198.18.4.201 router_id=192.168.0.6 loopback1=192.168.0.100
 [leaf]
-198.18.4.101 router_id=192.168.0.8 loopbacl1=192.168.0.18
-198.18.4.102 router_id=192.168.0.9 loopbacl1=192.168.0.19
+198.18.4.101 router_id=192.168.0.8 loopback1=192.168.0.18
 198.18.4.103 router_id=192.168.0.10 loopback1=192.168.0.110
 [server]
 198.18.134.50 eth1=172.21.140.10 gw=172.21.140.1
-198.18.134.51 eth1=172.21.141.10 gw=172.21.141.1
 198.18.134.52 eth1=172.21.140.11 gw=172.21.140.1
 198.18.134.53 eth1=172.21.141.11 gw=172.21.141.1
+[f5]
+198.18.4.10

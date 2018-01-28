@@ -1,4 +1,5 @@
 ---
+#Task 2: Simple playbook assign VLAN to server facing port
   - hosts: leaf:jinja2_leaf
     vars:
       nxos_provider:
@@ -28,7 +29,6 @@
           mode: access
           access_vlan: 140
           provider: "{{nxos_provider}}"
-        tags: even leaf
       - name: configure VLAN for server port
         when: ("102" in inventory_hostname) or ("104" in inventory_hostname)
         nxos_switchport:
@@ -36,4 +36,3 @@
           mode: access
           access_vlan: 141
           provider: "{{nxos_provider}}"
-        tags: odd leaf
